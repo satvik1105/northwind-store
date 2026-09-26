@@ -242,7 +242,6 @@ export async function createStreamChannel(
 export async function createVideoInvite(
   req: Request,
   res: Response,
-  next: NextFunction,
 ) {
   try {
     const { userId, isAuthenticated } = getAuth(req);
