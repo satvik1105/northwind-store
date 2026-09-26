@@ -17,7 +17,10 @@ const envSchema = z.object({
   POLAR_WEBHOOK_SECRET: z.string().optional(),
   POLAR_API_BASE: z.string().url().default("https://api.polar.sh"),
 
-  POLAR_CHECKOUT_PRODUCT_ID: z.string().uuid(),
+  POLAR_CHECKOUT_PRODUCT_ID: z.preprocess(
+  (val) => (val === "" ? undefined : val),
+  z.string().uuid().optional()
+),
 
   STREAM_API_KEY: z.string().min(1),
   STREAM_API_SECRET: z.string().min(1),
