@@ -34,15 +34,50 @@ export async function listOrders(
       return;
     }
 
+    /*
+     * Staff/admin:
+     * Return all orders + customer name/email.
+     *
+     * Customer:
+     * Return only their own orders + their own name/email.
+     */
     const rows = isStaff(localUser.role)
-      ? await db.select().from(orders).orderBy(desc(orders.createdAt))
-      : await db
-          .select()
+      ? await db
+          .select({
+            id: orders.id,
+            userId: orders.userId,
+            status: orders.status,
+            polarCheckoutId: orders.polarCheckoutId,
+            polarOrderId: orders.polarOrderId,
+            totalCents: orders.totalCents,
+            createdAt: orders.createdAt,
+            updatedAt: orders.updatedAt,
+            customerName: users.displayName,
+            customerEmail: users.email,
+          })
           .from(orders)
+          .leftJoin(users, eq(orders.userId, users.id))
+          .orderBy(desc(orders.createdAt))
+      : await db
+          .select({
+            id: orders.id,
+            userId: orders.userId,
+            status: orders.status,
+            polarCheckoutId: orders.polarCheckoutId,
+            polarOrderId: orders.polarOrderId,
+            totalCents: orders.totalCents,
+            createdAt: orders.createdAt,
+            updatedAt: orders.updatedAt,
+            customerName: users.displayName,
+            customerEmail: users.email,
+          })
+          .from(orders)
+          .leftJoin(users, eq(orders.userId, users.id))
           .where(eq(orders.userId, localUser.id))
           .orderBy(desc(orders.createdAt));
 
     const orderIds = rows.map((r) => r.id);
+
     const previewByOrder = new Map();
 
     if (orderIds.length > 0) {
