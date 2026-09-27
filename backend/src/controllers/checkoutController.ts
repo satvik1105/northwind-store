@@ -117,7 +117,7 @@ export async function createCheckout(
         userId: localUser.id,
         lines,
         totalCents,
-        currency: "usd",
+        currency: "inr",
       })
       .returning();
 
