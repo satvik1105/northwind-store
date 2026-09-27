@@ -1,6 +1,6 @@
 # 🛒 PERN Stack E-Commerce Platform 🚀
 
-![Demo App](/frontend/public/screenshot-for-readme.png)
+![ShopNest Banner](./7df7eae8-2cb7-46ee-a93d-dde659a3234d.png)
 
 ---
 
