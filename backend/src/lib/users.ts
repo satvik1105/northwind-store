@@ -13,19 +13,14 @@ const clerkClient = createClerkClient({
 });
 
 export async function getLocalUser(clerkUserId: string) {
-  // First check our local database
   const [existingUser] = await db
     .select()
     .from(users)
     .where(eq(users.clerkUserId, clerkUserId))
     .limit(1);
 
-  if (existingUser) {
-    return existingUser;
-  }
-
-  // User is authenticated in Clerk but not synced to our DB yet.
-  // Fetch the user directly from Clerk and create the local record.
+  // Always fetch the latest user information from Clerk.
+  // This keeps the local email synced with the actual Clerk account.
   const clerkUser = await clerkClient.users.getUser(clerkUserId);
 
   const email =
@@ -42,9 +37,13 @@ export async function getLocalUser(clerkUserId: string) {
     clerkUser.username ||
     null;
 
-  const role = parseRole(clerkUser.publicMetadata?.role);
+  // Keep an existing local role.
+  // For a new user, use the role from Clerk metadata.
+  const role =
+    existingUser?.role ??
+    parseRole(clerkUser.publicMetadata?.role);
 
-  const [createdUser] = await db
+  const [syncedUser] = await db
     .insert(users)
     .values({
       clerkUserId: clerkUser.id,
@@ -62,5 +61,5 @@ export async function getLocalUser(clerkUserId: string) {
     })
     .returning();
 
-  return createdUser;
+  return syncedUser;
 }
