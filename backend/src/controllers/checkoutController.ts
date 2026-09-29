@@ -11,6 +11,7 @@ import {
   products,
 } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
+import { sendOrderConfirmationEmail } from "../lib/emailService";
 
 const cartSchema = z.object({
   items: z
@@ -29,7 +30,6 @@ export async function createCheckout(
   next: NextFunction,
 ) {
   try {
-    // Only signed-in users can checkout
     const { userId, isAuthenticated } = getAuth(req);
 
     if (!isAuthenticated || !userId) {
@@ -58,7 +58,6 @@ export async function createCheckout(
 
     const ids = parsed.data.items.map((item) => item.productId);
 
-    // Load active products from database
     const prodRows = await db
       .select()
       .from(products)
@@ -110,7 +109,6 @@ export async function createCheckout(
       return;
     }
 
-    // Create checkout session for tracking
     const [session] = await db
       .insert(checkoutSessions)
       .values({
@@ -121,13 +119,6 @@ export async function createCheckout(
       })
       .returning();
 
-    /*
-     * DEMO / CASH ON DELIVERY CHECKOUT
-     *
-     * No real payment is processed.
-     * The order is created as "paid"
-     * to preserve the same flow as local development.
-     */
     const [order] = await db
       .insert(orders)
       .values({
@@ -138,7 +129,6 @@ export async function createCheckout(
       })
       .returning();
 
-    // Create order items
     if (lines.length > 0) {
       await db.insert(orderItems).values(
         lines.map((line) => ({
@@ -150,17 +140,19 @@ export async function createCheckout(
       );
     }
 
-    // Checkout session is no longer needed
+    // Send order confirmation email
+    if (localUser.email) {
+      await sendOrderConfirmationEmail({
+        to: localUser.email,
+        orderId: order.id,
+        totalCents: order.totalCents,
+      });
+    }
+
     await db
       .delete(checkoutSessions)
       .where(eq(checkoutSessions.id, session.id));
 
-    /*
-     * Redirect to orders page.
-     *
-     * Demo checkout:
-     * No payment gateway is involved.
-     */
     res.json({
       checkoutUrl: `${process.env.FRONTEND_URL}/orders`,
       orderId: order.id,

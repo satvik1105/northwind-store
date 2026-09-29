@@ -1,9 +1,16 @@
-import { Show, SignInButton, SignUpButton, useAuth, UserButton } from "@clerk/react";
+import {
+  Show,
+  SignInButton,
+  SignUpButton,
+  useAuth,
+  UserButton,
+} from "@clerk/react";
 import PageLoader from "./components/PageLoader";
 import Layout from "./components/Layout";
 import { Routes, Route, Navigate } from "react-router";
 import HomePage from "./pages/HomePage";
 import CartPage from "./pages/CartPage";
+import WishlistPage from "./pages/WishlistPage";
 import OrdersPage from "./pages/OrdersPage";
 import CheckoutReturnPage from "./pages/CheckoutReturnPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
@@ -23,30 +30,73 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/product/:slug" element={<ProductDetailPage />} />
+
+        <Route path="/wishlist" element={<WishlistPage />} />
+
+        <Route
+          path="/product/:slug"
+          element={<ProductDetailPage />}
+        />
+
         <Route
           path="/orders"
-          element={isSignedIn ? <OrdersPage /> : <Navigate to={"/"} replace />}
+          element={
+            isSignedIn ? (
+              <OrdersPage />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
-        <Route path="/checkout/return" element={<CheckoutReturnPage />} />
 
-        <Route path="/demo-sentry" element={<SentryDemoPage />} />
+        <Route
+          path="/checkout/return"
+          element={<CheckoutReturnPage />}
+        />
+
+        <Route
+          path="/demo-sentry"
+          element={<SentryDemoPage />}
+        />
 
         <Route
           path="/orders/:id/call"
-          element={isSignedIn ? <OrderVideoPage /> : <Navigate to={"/"} replace />}
+          element={
+            isSignedIn ? (
+              <OrderVideoPage />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
 
         <Route
           path="/admin"
-          element={isSignedIn ? <AdminProductsPage /> : <Navigate to="/" replace />}
+          element={
+            isSignedIn ? (
+              <AdminProductsPage />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
         />
 
         {/* NESTED ROUTES */}
-        <Route path="/orders/:id" element={<OrderDetailPage />}>
-          <Route index element={<OrderSummaryPage />} />
-          <Route path="chat" element={<OrderChatPage />} />
+        <Route
+          path="/orders/:id"
+          element={<OrderDetailPage />}
+        >
+          <Route
+            index
+            element={<OrderSummaryPage />}
+          />
+
+          <Route
+            path="chat"
+            element={<OrderChatPage />}
+          />
         </Route>
       </Routes>
     </Layout>

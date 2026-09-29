@@ -72,7 +72,7 @@ function OrderDetailPage() {
                   Order total
                 </p>
                 <p className="text-2xl font-bold tabular-nums text-base-content sm:text-3xl">
-                  {formatPrice(order.totalCents, "usd")}
+                  {formatPrice(order.totalCents, "inr")}
                 </p>
               </div>
             </div>

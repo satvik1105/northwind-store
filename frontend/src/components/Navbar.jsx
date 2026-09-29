@@ -10,8 +10,11 @@ import {
   ShoppingBagIcon,
   ShoppingCartIcon,
   StoreIcon,
+  HeartIcon,
 } from "lucide-react";
+
 import { useCart } from "../store/cart";
+import { useWishlist } from "../store/wishlist";
 
 const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
@@ -24,7 +27,11 @@ const Navbar = () => {
 
   const role = meData?.user?.role;
 
-  const cartCount = useCart((s) => s.items.reduce((n, line) => n + line.quantity, 0));
+  const cartCount = useCart((s) =>
+    s.items.reduce((n, line) => n + line.quantity, 0),
+  );
+
+  const wishlistCount = useWishlist((s) => s.items.length);
 
   return (
     <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md">
@@ -37,59 +44,148 @@ const Navbar = () => {
             <span className="flex size-10 items-center justify-center rounded-lg bg-primary/15 p-1 text-primary">
               <StoreIcon className="size-8" aria-hidden />
             </span>
+
             <span className="leading-none">Northwind</span>
           </Link>
         </div>
 
         <nav className="flex items-center gap-1 md:gap-1.5">
-          <Link to="/" className="btn btn-ghost gap-2 font-medium">
-            <ShoppingBagIcon className="size-6 opacity-90" aria-hidden />
-            <span className="hidden sm:inline">Shop</span>
+          {/* SHOP */}
+          <Link
+            to="/"
+            className="btn btn-ghost gap-2 font-medium"
+          >
+            <ShoppingBagIcon
+              className="size-6 opacity-90"
+              aria-hidden
+            />
+            <span className="hidden sm:inline">
+              Shop
+            </span>
           </Link>
 
+          {/* ORDERS + ADMIN */}
           <Show when={"signed-in"}>
-            <Link to="/orders" className="btn btn-ghost gap-2 font-medium">
-              <PackageIcon className="size-6 opacity-90" aria-hidden />
-              <span className="hidden sm:inline">Orders</span>
+            <Link
+              to="/orders"
+              className="btn btn-ghost gap-2 font-medium"
+            >
+              <PackageIcon
+                className="size-6 opacity-90"
+                aria-hidden
+              />
+              <span className="hidden sm:inline">
+                Orders
+              </span>
             </Link>
 
             {role === "admin" ? (
-              <Link to="/admin" className="btn btn-ghost gap-2 font-medium text-secondary">
-                <SettingsIcon className="size-6" aria-hidden />
-                <span className="hidden sm:inline">Admin</span>
+              <Link
+                to="/admin"
+                className="btn btn-ghost gap-2 font-medium text-secondary"
+              >
+                <SettingsIcon
+                  className="size-6"
+                  aria-hidden
+                />
+
+                <span className="hidden sm:inline">
+                  Admin
+                </span>
               </Link>
             ) : null}
           </Show>
 
+          {/* WISHLIST */}
+          <Link
+            to="/wishlist"
+            className="btn btn-ghost gap-2 font-medium indicator"
+            aria-label={
+              wishlistCount > 0
+                ? `Wishlist, ${wishlistCount} items`
+                : "Wishlist"
+            }
+          >
+            {wishlistCount > 0 ? (
+              <span className="indicator-item badge badge-sm badge-error min-w-2 px-1.5 font-sans text-xs tabular-nums">
+                {wishlistCount > 99
+                  ? "99+"
+                  : wishlistCount}
+              </span>
+            ) : null}
+
+            <HeartIcon
+              className={`size-6 opacity-90 ${
+                wishlistCount > 0
+                  ? "fill-current text-error"
+                  : ""
+              }`}
+              aria-hidden
+            />
+
+            <span className="hidden sm:inline">
+              Wishlist
+            </span>
+          </Link>
+
+          {/* CART */}
           <Link
             to="/cart"
             className="btn btn-ghost gap-2 font-medium indicator"
-            aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
+            aria-label={
+              cartCount > 0
+                ? `Cart, ${cartCount} items`
+                : "Cart"
+            }
           >
             {cartCount > 0 ? (
               <span className="indicator-item badge badge-sm badge-primary min-w-2 px-1.5 font-sans text-xs tabular-nums">
-                {cartCount > 99 ? "99+" : cartCount}
+                {cartCount > 99
+                  ? "99+"
+                  : cartCount}
               </span>
             ) : null}
-            <ShoppingCartIcon className="size-6 opacity-90" aria-hidden />
-            <span className="hidden sm:inline">Cart</span>
+
+            <ShoppingCartIcon
+              className="size-6 opacity-90"
+              aria-hidden
+            />
+
+            <span className="hidden sm:inline">
+              Cart
+            </span>
           </Link>
 
+          {/* SIGN IN */}
           <Show when={"signed-out"}>
             <SignInButton mode="modal">
-              <button type="button" className="btn btn-primary btn-sm gap-1.5 px-3 shadow-md">
-                <LogInIcon className="size-4 drop-shadow-sm" aria-hidden />
+              <button
+                type="button"
+                className="btn btn-primary btn-sm gap-1.5 px-3 shadow-md"
+              >
+                <LogInIcon
+                  className="size-4 drop-shadow-sm"
+                  aria-hidden
+                />
                 Sign in
               </button>
             </SignInButton>
           </Show>
 
+          {/* USER */}
           <Show when={"signed-in"}>
             <div className="flex items-center gap-2 border-l border-base-300 pl-3">
               <UserButton
-                appearance={{ elements: { avatarBox: "h-10 w-10 ring-2 ring-base-300" } }}
+                appearance={{
+                  elements: {
+                    avatarBox:
+                      "h-10 w-10 ring-2 ring-base-300",
+                  },
+                }}
               />
-              {role === "support" || role === "admin" ? (
+
+              {role === "support" ||
+              role === "admin" ? (
                 <span className="badge badge-primary badge-sm hidden capitalize md:inline-flex">
                   {role}
                 </span>

@@ -14,7 +14,7 @@ const items = [
   {
     icon: CreditCardIcon,
     title: "Transparent",
-    desc: "Prices in USD, tax where applicable",
+    desc: "Prices in INR, tax where applicable",
   },
   {
     icon: HeadphonesIcon,

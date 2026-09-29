@@ -2,6 +2,7 @@ import { HeadphonesIcon, VideoIcon } from "lucide-react";
 import { OrderChatPanelSkeleton } from "../components/LoadingSkeletons.jsx";
 import { PageError } from "../components/PageError.jsx";
 import { useOrderChatPage } from "../hooks/useOrderChatPage.js";
+import SupportBot from "../components/SupportBot.jsx";
 import {
   Chat,
   Channel,
@@ -14,20 +15,37 @@ import {
 import "stream-chat-react/dist/css/v2/index.css";
 
 function OrderChatPage() {
-  const { paid, client, error, channel, canInvite, inviteMutation } = useOrderChatPage();
+  const { paid, client, error, channel, canInvite, inviteMutation } =
+    useOrderChatPage();
 
   if (!paid) {
-    return <p className="text-base-content/60">Complete payment to open support chat.</p>;
+    return (
+      <p className="text-base-content/60">
+        Complete payment to open support chat.
+      </p>
+    );
   }
+
   if (error) {
     return <PageError message={error} />;
   }
+
   if (!client || !channel) {
     return <OrderChatPanelSkeleton />;
   }
 
   return (
     <div className="space-y-4 text-left">
+      {/* Automatic Support Bot */}
+      <SupportBot
+        onTalkToSupport={() => {
+          document
+            .querySelector(".stream-panel")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
+
+      {/* Human Support */}
       <div className="card border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body flex-row flex-wrap items-start gap-4">
           <div className="avatar placeholder">
@@ -38,9 +56,11 @@ function OrderChatPage() {
 
           <div className="flex-1">
             <h3 className="card-title text-base">Message support</h3>
+
             <p className="text-sm text-base-content/70">
-              Ask about this order, shipping, or returns. Support can send a video call link here
-              when needed; both sides use the same Join button.
+              Ask about this order, shipping, or returns. Support can send a
+              video call link here when needed; both sides use the same Join
+              button.
             </p>
 
             {canInvite ? (
@@ -56,15 +76,20 @@ function OrderChatPage() {
                   ) : (
                     <VideoIcon className="size-4" aria-hidden />
                   )}
+
                   Send video call invite
                 </button>
 
                 {inviteMutation.isError ? (
-                  <span className="text-sm text-error">Could not send invite.</span>
+                  <span className="text-sm text-error">
+                    Could not send invite.
+                  </span>
                 ) : null}
 
                 {inviteMutation.isSuccess ? (
-                  <span className="text-sm text-success">Invite sent.</span>
+                  <span className="text-sm text-success">
+                    Invite sent.
+                  </span>
                 ) : null}
               </div>
             ) : null}
@@ -72,14 +97,19 @@ function OrderChatPage() {
         </div>
       </div>
 
-      <div className="stream-panel h-140 overflow-hidden rounded-box border border-neutral-700 bg-neutral-950 [&_.str-chat\_\_main-panel]:min-h-0">
-        <Chat client={client} theme="messaging str-chat__theme-dark">
+      {/* Stream Human Support Chat */}
+      <div className="stream-panel h-140 overflow-hidden rounded-box border border-neutral-700 bg-neutral-950 [&_.str-chat__main-panel]:min-h-0">
+        <Chat
+          client={client}
+          theme="messaging str-chat__theme-dark"
+        >
           <Channel channel={channel}>
             <Window>
               <ChannelHeader />
               <MessageList />
               <MessageInput focus />
             </Window>
+
             <Thread />
           </Channel>
         </Chat>
@@ -87,4 +117,5 @@ function OrderChatPage() {
     </div>
   );
 }
+
 export default OrderChatPage;

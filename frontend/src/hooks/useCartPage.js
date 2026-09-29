@@ -1,5 +1,4 @@
 import { useAuth } from "@clerk/react";
-
 import { useCart } from "../store/cart";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
@@ -12,6 +11,7 @@ export default function useCartPage() {
   const items = useCart((s) => s.items);
   const setQty = useCart((s) => s.setQty);
   const removeItem = useCart((s) => s.removeItem);
+  const clear = useCart((s) => s.clear);
 
   const {
     data,
@@ -24,42 +24,61 @@ export default function useCartPage() {
   });
 
   const products = data?.products ?? [];
-  const byId = new Map(products.map((p) => [p.id, p]));
+
+  const byId = new Map(
+    products.map((p) => [p.id, p]),
+  );
+
   const lines = items.map((line) => ({
     line,
     product: byId.get(line.productId) ?? null,
   }));
 
-  const subtotal = lines.reduce((sum, { line, product: p }) => {
-    if (!p) return sum;
-    return sum + p.priceCents * line.quantity;
-  }, 0);
+  const subtotal = lines.reduce(
+    (sum, { line, product: p }) => {
+      if (!p) return sum;
+
+      return sum + p.priceCents * line.quantity;
+    },
+    0,
+  );
 
   async function checkout() {
     setCheckoutLoading(true);
 
-    const body = {
-      items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-    };
+    try {
+      const body = {
+        items: items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+      };
 
-    const res = await apiFetch("/api/checkout", {
-      getToken,
-      method: "POST",
-      body,
-    });
+      const res = await apiFetch("/api/checkout", {
+        getToken,
+        method: "POST",
+        body,
+      });
 
-    if (res?.checkoutUrl) {
-      window.location.href = res.checkoutUrl;
-      return;
+      if (res?.checkoutUrl) {
+        clear();
+
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+
+      setCheckoutLoading(false);
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      setCheckoutLoading(false);
     }
-
-    setCheckoutLoading(false);
   }
 
   return {
     items,
     setQty,
     removeItem,
+    clear,
     productsLoading,
     productsError,
     lines,
