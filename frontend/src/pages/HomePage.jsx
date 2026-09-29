@@ -16,14 +16,25 @@ function HomePage() {
     setCategory,
   } = useHomeCatalog();
 
+  function handleShopCatalog() {
+    document.getElementById("catalog")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   return (
     <div className="space-y-12">
-      <HomeHero categories={categories} loadingCategories={loadingCategories} />
+      <HomeHero
+        categories={categories}
+        loadingCategories={loadingCategories}
+        onShopCatalog={handleShopCatalog}
+      />
 
       <TrustStrip />
 
-      {/* CATELOG */}
-      <section id="catolag" className="scroll-mt-24">
+      {/* CATALOG */}
+      <section id="catalog" className="scroll-mt-24">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
@@ -34,7 +45,11 @@ function HomePage() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className={`btn btn-sm ${!categoryFilter ? "btn-primary" : "btn-ghost border border-base-300"}`}
+              className={`btn btn-sm ${
+                !categoryFilter
+                  ? "btn-primary"
+                  : "btn-ghost border border-base-300"
+              }`}
               onClick={() => setCategory("")}
             >
               All
@@ -42,13 +57,21 @@ function HomePage() {
 
             {categoryChipsLoading
               ? [1, 2, 3, 4].map((i) => (
-                  <div key={i} className="skeleton h-8 w-20 rounded-lg" aria-hidden />
+                  <div
+                    key={i}
+                    className="skeleton h-8 w-20 rounded-lg"
+                    aria-hidden
+                  />
                 ))
               : categories.map((c) => (
                   <button
                     key={c}
                     type="button"
-                    className={`btn btn-sm ${categoryFilter === c ? "btn-primary" : "btn-ghost border border-base-300"}`}
+                    className={`btn btn-sm ${
+                      categoryFilter === c
+                        ? "btn-primary"
+                        : "btn-ghost border border-base-300"
+                    }`}
                     onClick={() => setCategory(c)}
                   >
                     {c}
@@ -84,4 +107,5 @@ function HomePage() {
     </div>
   );
 }
+
 export default HomePage;

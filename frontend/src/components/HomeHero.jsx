@@ -1,7 +1,11 @@
 import { Link } from "react-router";
 import { ArrowRightIcon, SparklesIcon } from "lucide-react";
 
-export function HomeHero({ categories, loadingCategories }) {
+export function HomeHero({
+  categories,
+  loadingCategories,
+  onShopCatalog,
+}) {
   return (
     <section className="relative overflow-hidden rounded-box border border-base-300 bg-linear-to-br from-base-100 via-base-100 to-primary/10 shadow-lg">
       <div
@@ -12,19 +16,25 @@ export function HomeHero({ categories, loadingCategories }) {
       <div className="relative grid gap-8 p-8 md:grid-cols-2 md:items-center md:p-12 lg:p-14">
         <div className="text-left">
           <h1 className="text-3xl font-bold tracking-tight text-base-content md:text-4xl lg:text-5xl">
-            Hardware &amp; workspace, <span className="text-primary">ready to ship</span>
+            Hardware &amp; workspace,{" "}
+            <span className="text-primary">ready to ship</span>
           </h1>
 
           <p className="mt-4 max-w-lg text-base leading-relaxed text-base-content/70">
-            Audio, wearables, workspace, and travel—curated for work and home. Secure checkout;
-            after payment, use your order page for support chat and video.
+            Audio, wearables, workspace, and travel—curated for work and home.
+            Secure checkout; after payment, use your order page for support
+            chat and video.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#catalog" className="btn btn-primary gap-2 shadow-md">
+            <button
+              type="button"
+              onClick={onShopCatalog}
+              className="btn btn-primary gap-2 shadow-md"
+            >
               Shop catalog
               <ArrowRightIcon className="size-4" aria-hidden />
-            </a>
+            </button>
 
             <Link to="/cart" className="btn btn-outline btn-primary">
               View cart
@@ -34,11 +44,16 @@ export function HomeHero({ categories, loadingCategories }) {
 
         <div className="grid gap-3">
           <div className="stat rounded-box border border-base-300 bg-base-100/80 px-4 py-3 shadow-sm">
-            <div className="stat-title text-xs uppercase text-base-content/50">Categories</div>
+            <div className="stat-title text-xs uppercase text-base-content/50">
+              Categories
+            </div>
 
             <div className="stat-value text-2xl text-secondary">
               {loadingCategories ? (
-                <span className="skeleton inline-block h-8 w-10 rounded" aria-hidden />
+                <span
+                  className="skeleton inline-block h-8 w-10 rounded"
+                  aria-hidden
+                />
               ) : (
                 categories.length
               )}
@@ -49,7 +64,10 @@ export function HomeHero({ categories, loadingCategories }) {
 
           <div className="rounded-box border border-dashed border-primary/30 bg-primary/5 px-4 py-3">
             <div className="flex items-center gap-2 text-sm font-medium text-base-content">
-              <SparklesIcon className="size-4 text-primary" aria-hidden />
+              <SparklesIcon
+                className="size-4 text-primary"
+                aria-hidden
+              />
               Secure checkout · Priority support on paid orders
             </div>
           </div>
